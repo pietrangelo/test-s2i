@@ -23,10 +23,9 @@ COPY filter-development-unix.properties /opt/entando/
 
 # Drop the root user and make the content of /opt/app-root owned by user 1001
 USER root
-RUN mkdir -p /opt/app-root/ && chmod 777 -R /opt/app-root/ \
-&& chmod 777 -R /opt/entando/
+RUN chmod 777 -R /opt/entando/
 
-WORKDIR /opt/app-root/
+WORKDIR /opt/entando/
 
 # This default user is created in the openshift/base-centos7 image
 USER 1001

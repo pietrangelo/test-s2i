@@ -16,14 +16,14 @@ fi
 #
 if [ "$(ls /tmp/artifacts/ 2>/dev/null)" ]; then
   echo "---> Restoring build artifacts..."
-  mv /tmp/artifacts/. /opt/app-root/
+  mv /tmp/artifacts/. /opt/entando/
 fi
 
 echo "---> Installing application source..."
-cp -Rf /tmp/src/. /opt/app-root/
+cp -Rf /tmp/src/. /opt/entando/
 
 echo "---> Building application from source..."
 # TODO: Add build steps for your application, eg npm install, bundle install, pip install, etc.
-cd /opt/app-root/fsi-customer
+cd /opt/entando/fsi-customer
 rm -f src/main/filters/filter-development-unix.properties
 cp -f /opt/entando/filter-development-unix.properties src/main/filters/
