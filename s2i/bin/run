@@ -1,0 +1,10 @@
+#!/bin/bash -e
+#
+# S2I run script for the 'entando-builder' image.
+# The run script executes the server that runs your application.
+#
+# For more information see the documentation:
+#	https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
+#
+
+exec mvn -f /opt/app-root/fsi-customer/pom.xml -Dmaven.repo.local=/opt/entando/.m2/repository jetty:run
