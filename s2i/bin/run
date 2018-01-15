@@ -8,5 +8,4 @@
 #
 
 #Fix permission on folders
-exec chmod 777 -R /opt/entando/
 exec mvn -f /opt/entando/fsi-customer/pom.xml -Dmaven.repo.local=/opt/entando/.m2/repository jetty:run
