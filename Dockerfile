@@ -23,8 +23,8 @@ COPY filter-development-unix.properties /opt/entando/
 
 # Drop the root user and make the content of /opt/app-root owned by user 1001
 USER root
-RUN mkdir -p /opt/app-root/ && chown -R 1001:0 /opt/app-root/ \
-&& chown -R 1001:0 /opt/entando/
+RUN mkdir -p /opt/app-root/ && chmod -R 777 /opt/app-root/ \
+&& chmod -R 777 /opt/entando/
 
 WORKDIR /opt/app-root/
 
