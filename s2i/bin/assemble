@@ -27,4 +27,3 @@ echo "---> Building application from source..."
 cd /opt/entando/fsi-customer
 rm -f src/main/filters/filter-development-unix.properties
 cp -f /opt/entando/filter-development-unix.properties src/main/filters/
-sudo chmod -R 777 /opt/entando/
