@@ -7,4 +7,6 @@
 #	https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
 #
 
+#Fix permission on folders
+exec chmod 777 -R /opt/entando/
 exec mvn -f /opt/entando/fsi-customer/pom.xml -Dmaven.repo.local=/opt/entando/.m2/repository jetty:run
