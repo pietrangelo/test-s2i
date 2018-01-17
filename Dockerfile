@@ -41,7 +41,7 @@ COPY ./s2i/bin/ /usr/local/s2i
 RUN adduser --system -u 10001 10001 \
 && yum -y install git java-1.8.0-openjdk-devel ImageMagick git wget \
 && mkdir -p ${APP_ROOT} && mkdir -p ${MAVEN_LOCAL_REPO} \
-&& chmod -R u+x ${APP_ROOT}/bin \
+#&& chmod -R u+x ${APP_ROOT}/bin \
 && chgrp -R 0 ${APP_ROOT} && chown -R 10001 ${APP_ROOT} \
 && chmod -R g=u ${APP_ROOT} /etc/passwd \
 && cd /tmp && wget http://www.eu.apache.org/dist/maven/maven-3/${MAVEN_RELEASE}/binaries/apache-maven-${MAVEN_RELEASE}-bin.tar.gz \
