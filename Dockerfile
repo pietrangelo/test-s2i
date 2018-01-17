@@ -1,34 +1,77 @@
 
 # entando-builder
-FROM pmasala/entando-base-image-432
-
+FROM centos:7.4.1708
 MAINTAINER Pietrangelo Masala <p.masala@entando.com>
 
-ENV ENTANDO_VERSION=4.3.2
-
-LABEL io.k8s.description="Entando builder image based on 4.3.2 release" \
-      io.k8s.display-name="entando 4.3.2" \
+### Atomic/OpenShift Labels
+LABEL name="entando/entando-openshift-base-image" \
+      maintainer="p.masala@entando.com" \
+      vendor="Entando Srl" \
+      version="1" \
+      release="1" \
+      summary="Entando base image for running on OpenShift environments" \
+      description="This base image includes all needed dependencies for running an entando project" \
+      url="https://www.entando.com" \
+      run='docker run -tdi --name ${NAME} \
+      -u 123456 \
+      ${IMAGE}' \
+      io.k8s.description="Entando base image for running on OpenShift environments" \
+      io.k8s.display-name="Entando base image 1.1" \
       io.openshift.expose-services="8080:http" \
-      io.openshift.tags="entando,ux-convergence,openshift" \
+      io.openshift.tags="entando,ux,openshift,docker" \
       io.openshift.s2i.scripts-url=image:///usr/local/s2i
 
-# TODO: Install required packages here:
+#Environment Variables
+ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0
+ENV JRE_HOME=/usr/lib/jvm/jre-1.8.0
+ENV MAVEN_HOME=/usr/share/maven
+ENV MAVEN_LOCAL_REPO=/opt/entando/repository
+ENV MAVEN_RELEASE=3.3.9
+ENV APP_ROOT=/opt/entando
+ENV PATH=${APP_ROOT}/bin:${PATH}
+ENV HOME=${APP_ROOT}
 
-# TODO (optional): Copy the builder files into /opt/app-root
-# COPY ./<builder_folder>/ /opt/app-root/
-
+#COPY bin/ ${APP_ROOT}/bin/
+# set default path for maven local repository to ${APP_ROOT}/repository
+COPY settings.xml /tmp/settings.xml
 # sets io.openshift.s2i.scripts-url label that way, or update that label
 COPY ./s2i/bin/ /usr/local/s2i
-COPY filter-development-unix.properties /opt/entando/
 
-# Drop the root user and make the content of /opt/app-root owned by user 1001
-USER root
-RUN chgrp -R 0 /opt/entando/ && chmod -Rf g=u /opt/entando/
+# Install Entando dependencies, software requirements and users
+RUN adduser --system -u 10001 10001 \
+&& yum -y install git java-1.8.0-openjdk-devel ImageMagick git wget \
+&& mkdir -p ${APP_ROOT} && mkdir -p ${MAVEN_LOCAL_REPO} \
+&& chmod -R u+x ${APP_ROOT}/bin \
+&& chgrp -R 0 ${APP_ROOT} && chown -R 10001 ${APP_ROOT} \
+&& chmod -R g=u ${APP_ROOT} /etc/passwd \
+&& cd /tmp && wget http://www.eu.apache.org/dist/maven/maven-3/${MAVEN_RELEASE}/binaries/apache-maven-${MAVEN_RELEASE}-bin.tar.gz \
+&& tar xzf apache-maven-${MAVEN_RELEASE}-bin.tar.gz \
+&& mkdir ${MAVEN_HOME} \
+&& cd apache-maven-${MAVEN_RELEASE}/ && cp -R * ${MAVEN_HOME} && cd .. && rm -rf /tmp/apache-maven* \
+&& alternatives --install /usr/bin/mvn mvn ${MAVEN_HOME}/bin/mvn 1 \
+&& alternatives --auto mvn \
+&& rm -f /usr/share/maven/conf/settings.xml \
+&& cp /tmp/settings.xml /usr/share/maven/conf/settings.xml \
+&& cd ${APP_ROOT} \
+&& git clone https://github.com/entando/entando-core.git \
+&& git clone https://github.com/entando/entando-components.git \
+&& git clone https://github.com/entando/entando-archetypes.git \
+&& cd entando-core && mvn -DskipTests install && mvn clean && cd .. \
+&& cd entando-components && mvn -DskipTests install && mvn clean && cd .. \
+&& cd entando-archetypes && mvn -DskipTests install && mvn clean && cd .. \
+&& rm -rf entando-* \
+&& chgrp -R 0 ${APP_ROOT} && chown -R 10001 ${APP_ROOT} \
+&& chmod -R g=u ${APP_ROOT} \
+&& yum -y clean all
 
-WORKDIR /opt/entando/
-
-# This default user is created in the openshift/base-centos7 image
+# run as user 10001 for OpenShift security constraints
 USER 10001
+WORKDIR ${APP_ROOT}
+
+# user name recognition at runtime w/ an arbitrary uid - for OpenShift deployments
+#ENTRYPOINT [ "uid_entrypoint" ]
+#VOLUME ${APP_ROOT}/logs ${APP_ROOT}/data
+#CMD run
 
 EXPOSE 8080
 
