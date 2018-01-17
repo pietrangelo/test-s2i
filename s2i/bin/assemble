@@ -20,10 +20,7 @@ if [ "$(ls /tmp/artifacts/ 2>/dev/null)" ]; then
 fi
 
 echo "---> Installing application source..."
-cp -Rf /tmp/src/. /tmp/entando/
+cp -Rf /tmp/src/. /opt/entando/
 
 echo "---> Building application from source..."
 # TODO: Add build steps for your application, eg npm install, bundle install, pip install, etc.
-cd /tmp/entando/fsi-customer
-rm -f src/main/filters/filter-development-unix.properties
-cp -f /opt/entando/filter-development-unix.properties src/main/filters/
