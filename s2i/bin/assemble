@@ -19,8 +19,19 @@ if [ "$(ls /tmp/artifacts/ 2>/dev/null)" ]; then
   mv /tmp/artifacts/. /opt/entando/
 fi
 
+# Add current user to the /etc/passwd file
+if ! whoami &> /dev/null; then
+  if [ -w /etc/passwd ]; then
+    echo "${USER_NAME:-default}:x:$(id -u):0:${USER_NAME:-default} user:${HOME}:/sbin/nologin" >> /etc/passwd
+  fi
+fi
+exec "$@"
+
 echo "---> Installing application source..."
 cp -Rf /tmp/src/. /opt/entando/
+
+# set permissions
+chmod -R ugo=rwx /opt/entando/fsi-customer
 
 echo "---> Building application from source..."
 # TODO: Add build steps for your application, eg npm install, bundle install, pip install, etc.

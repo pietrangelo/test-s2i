@@ -7,5 +7,5 @@
 #	https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
 #
 
-#Fix permission on folders
+#run entando Application
 exec mvn -f /opt/entando/fsi-customer/pom.xml jetty:run

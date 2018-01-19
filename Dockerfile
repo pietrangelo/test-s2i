@@ -42,8 +42,8 @@ RUN adduser --system -u 10001 10001 \
 && yum -y install git java-1.8.0-openjdk-devel ImageMagick git wget \
 && mkdir -p ${APP_ROOT} && mkdir -p ${MAVEN_LOCAL_REPO} \
 #&& chmod -R u+x ${APP_ROOT}/bin \
-&& chgrp -R 0 ${APP_ROOT} && chown -R 10001 ${APP_ROOT} \
-&& chmod -R g=u ${APP_ROOT} /etc/passwd \
+&& chgrp -R 0 ${APP_ROOT} && chown -R 10001:0 ${APP_ROOT} \
+&& chmod -R ugo=rwx ${APP_ROOT} /etc/passwd \
 && cd /tmp && wget http://www.eu.apache.org/dist/maven/maven-3/${MAVEN_RELEASE}/binaries/apache-maven-${MAVEN_RELEASE}-bin.tar.gz \
 && tar xzf apache-maven-${MAVEN_RELEASE}-bin.tar.gz \
 && mkdir ${MAVEN_HOME} \
@@ -60,18 +60,16 @@ RUN adduser --system -u 10001 10001 \
 && cd entando-components && mvn -DskipTests install && mvn clean && cd .. \
 && cd entando-archetypes && mvn -DskipTests install && mvn clean && cd .. \
 && rm -rf entando-* \
-&& chgrp -R 0 ${APP_ROOT} && chown -R 10001 ${APP_ROOT} \
-&& chmod -R g=u ${APP_ROOT} \
+&& chgrp -R 0 ${APP_ROOT} && chown -R 10001:0 ${APP_ROOT} \
+&& chmod -R ugo=rwx ${APP_ROOT} \
 && yum -y clean all
 
 # run as user 10001 for OpenShift security constraints
 USER 10001
 WORKDIR ${APP_ROOT}
 
-# user name recognition at runtime w/ an arbitrary uid - for OpenShift deployments
-#ENTRYPOINT [ "uid_entrypoint" ]
-#VOLUME ${APP_ROOT}/logs ${APP_ROOT}/data
-#CMD run
+RUN chgrp -R 0 ${APP_ROOT} && chown -R 10001:0 ${APP_ROOT} \
+&& chmod -R ugo=rwx ${APP_ROOT}
 
 EXPOSE 8080
 
