@@ -8,4 +8,4 @@
 #
 
 #run entando Application
-exec mvn -f /opt/entando/fsi-customer/pom.xml jetty:run
+exec mvn -f /opt/entando/pom.xml jetty:run
